@@ -7,7 +7,8 @@ def insert_into_all(item, nested_list):
     >>> insert_into_all(0, nl)
     [[0], [0, 1, 2], [0, 3]]
     """
-    return ______________________________
+    return [[item] + a for a in nested_list]
+
 
 def subseqs(s):
     """Assuming that S is a list, return a nested list of all subsequences
@@ -19,11 +20,11 @@ def subseqs(s):
     >>> subseqs([])
     [[]]
     """
-    if ________________:
-        ________________
+    if s == []:
+        return [[]]
     else:
-        ________________
-        ________________
+        sub_s = subseqs(s[1:])
+        return insert_into_all(s[0], sub_s) + sub_s
 
 
 def inc_subseqs(s):
@@ -40,16 +41,18 @@ def inc_subseqs(s):
     >>> sorted(seqs2)
     [[], [1], [1], [1, 1], [1, 1, 2], [1, 2], [1, 2], [2]]
     """
+
     def subseq_helper(s, prev):
         if not s:
-            return ____________________
+            return [[]]
         elif s[0] < prev:
-            return ____________________
+            return subseq_helper(s[1:], prev)
         else:
-            a = ______________________
-            b = ______________________
-            return insert_into_all(________, ______________) + ________________
-    return subseq_helper(____, ____)
+            a = subseq_helper(s[1:], s[0])
+            b = subseq_helper(s[1:], prev)
+            return insert_into_all(s[0], a) + b
+
+    return subseq_helper(s, 0)
 
 
 def num_trees(n):
@@ -72,9 +75,10 @@ def num_trees(n):
     429
 
     """
-    if ____________________:
-        return _______________
-    return _______________
+    if n == 1:
+        return 1
+    # return sum(num_trees(n - k) * num_trees(k) for k in range(1, n))
+    return int(2 * (2 * n - 3) / n * num_trees(n - 1))
 
 
 def make_generators_generator(g):
@@ -111,12 +115,14 @@ def make_generators_generator(g):
     6
     9
     """
+
     def gen(i):
         for ___________ in ___________:
             if _________________________:
                 _________________________
             _______________________
             _______________________
+
     __________________________
     for _________ in __________________:
         ______________________________
@@ -127,6 +133,7 @@ class Button:
     """
     Represents a single button
     """
+
     def __init__(self, pos, key):
         """
         Creates a button
@@ -134,6 +141,7 @@ class Button:
         self.pos = pos
         self.key = key
         self.times_pressed = 0
+
 
 class Keyboard:
     """A Keyboard takes in an arbitrary amount of buttons, and has a
@@ -211,13 +219,17 @@ def make_advanced_counter_maker():
     1
     """
     ________________
+
     def ____________(__________):
         ________________
+
         def ____________(__________):
             ________________
             "*** YOUR CODE HERE ***"
             # as many lines as you want
+
         ________________
+
     ________________
 
 
@@ -259,16 +271,17 @@ def trade(first, second):
 
     if equal_prefix():
         first[:m], second[:n] = second[:n], first[:m]
-        return 'Deal!'
+        return "Deal!"
     else:
-        return 'No deal!'
+        return "No deal!"
 
 
 def card(n):
     """Return the playing card numeral as a string for a positive n <= 13."""
     assert type(n) == int and n > 0 and n <= 13, "Bad card n"
-    specials = {1: 'A', 11: 'J', 12: 'Q', 13: 'K'}
+    specials = {1: "A", 11: "J", 12: "Q", 13: "K"}
     return specials.get(n, str(n))
+
 
 def shuffle(cards):
     """Return a shuffled list that interleaves the two halves of cards.
@@ -288,7 +301,7 @@ def shuffle(cards):
     >>> cards[:12]  # Should not be changed
     ['A♡', 'A♢', 'A♤', 'A♧', '2♡', '2♢', '2♤', '2♧', '3♡', '3♢', '3♤', '3♧']
     """
-    assert len(cards) % 2 == 0, 'len(cards) must be even'
+    assert len(cards) % 2 == 0, "len(cards) must be even"
     half = _______________
     shuffled = []
     for i in _____________:
@@ -322,7 +335,6 @@ def insert(link, value, index):
         ____________________
 
 
-
 def deep_len(lnk):
     """ Returns the deep length of a possibly deep linked list.
 
@@ -346,7 +358,7 @@ def deep_len(lnk):
 
 
 def make_to_string(front, mid, back, empty_repr):
-    """ Returns a function that turns linked lists to strings.
+    """Returns a function that turns linked lists to strings.
 
     >>> kevins_to_string = make_to_string("[", "|-]-->", "", "[]")
     >>> jerrys_to_string = make_to_string("(", " . ", ")", "()")
@@ -360,11 +372,13 @@ def make_to_string(front, mid, back, empty_repr):
     >>> jerrys_to_string(Link.empty)
     '()'
     """
+
     def printer(lnk):
         if ______________:
             return _________________________
         else:
             return _________________________
+
     return printer
 
 
@@ -412,6 +426,7 @@ class Link:
     >>> print(s)                             # Prints str(s)
     <5 7 <8 9>>
     """
+
     empty = ()
 
     def __init__(self, first, rest=empty):
@@ -421,17 +436,17 @@ class Link:
 
     def __repr__(self):
         if self.rest is not Link.empty:
-            rest_repr = ', ' + repr(self.rest)
+            rest_repr = ", " + repr(self.rest)
         else:
-            rest_repr = ''
-        return 'Link(' + repr(self.first) + rest_repr + ')'
+            rest_repr = ""
+        return "Link(" + repr(self.first) + rest_repr + ")"
 
     def __str__(self):
-        string = '<'
+        string = "<"
         while self.rest is not Link.empty:
-            string += str(self.first) + ' '
+            string += str(self.first) + " "
             self = self.rest
-        return string + str(self.first) + '>'
+        return string + str(self.first) + ">"
 
 
 class Tree:
@@ -444,6 +459,7 @@ class Tree:
     >>> t.branches[1].is_leaf()
     True
     """
+
     def __init__(self, label, branches=[]):
         for b in branches:
             assert isinstance(b, Tree)
@@ -495,16 +511,16 @@ class Tree:
 
     def __repr__(self):
         if self.branches:
-            branch_str = ', ' + repr(self.branches)
+            branch_str = ", " + repr(self.branches)
         else:
-            branch_str = ''
-        return 'Tree({0}{1})'.format(self.label, branch_str)
+            branch_str = ""
+        return "Tree({0}{1})".format(self.label, branch_str)
 
     def __str__(self):
         def print_tree(t, indent=0):
-            tree_str = '  ' * indent + str(t.label) + "\n"
+            tree_str = "  " * indent + str(t.label) + "\n"
             for b in t.branches:
                 tree_str += print_tree(b, indent + 1)
             return tree_str
-        return print_tree(self).rstrip()
 
+        return print_tree(self).rstrip()
