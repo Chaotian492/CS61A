@@ -117,16 +117,13 @@ def make_generators_generator(g):
     """
 
     def gen(i):
-        for ___________ in ___________:
-            if _________________________:
-                _________________________
-            _______________________
-            _______________________
+        g_1 = g()
+        for _ in range(i):
+            yield next(g_1)
 
-    __________________________
-    for _________ in __________________:
-        ______________________________
-        ______________________________
+    gen_len = len(list(g()))
+    for i in range(gen_len):
+        yield gen(i + 1)
 
 
 class Button:
@@ -167,26 +164,28 @@ class Keyboard:
     """
 
     def __init__(self, *args):
-        ________________
-        for _________ in ________________:
-            ________________
+        self.buttons = {}
+        for arg in args:
+            assert isinstance(arg, Button)
+            self.buttons[arg.pos] = arg
 
     def press(self, info):
         """Takes in a position of the button pressed, and
         returns that button's output"""
-        if ____________________:
-            ________________
-            ________________
-            ________________
-        ________________
+        if info in self.buttons.keys():
+            press_button = self.buttons[info]
+            press_button.times_pressed += 1
+            return press_button.key
+        return ""
 
     def typing(self, typing_input):
         """Takes in a list of positions of buttons pressed, and
         returns the total output"""
-        ________________
-        for ________ in ____________________:
-            ________________
-        ________________
+        type_list = ""
+        for pos in typing_input:
+            self.buttons[pos].times_pressed += 1
+            type_list += self.buttons[pos].key
+        return type_list
 
 
 def make_advanced_counter_maker():
@@ -218,19 +217,31 @@ def make_advanced_counter_maker():
     >>> tom_counter('global-count')
     1
     """
-    ________________
+    global_count = 0
 
-    def ____________(__________):
-        ________________
+    def make_count():
+        local_count = 0
 
-        def ____________(__________):
-            ________________
+        def name_count(messages):
+            nonlocal local_count, global_count
+            if messages == "count":
+                local_count += 1
+                return local_count
+            elif messages == "global-count":
+                global_count += 1
+                return global_count
+            elif messages == "reset":
+                local_count = 0
+                return
+            elif messages == "global-reset":
+                global_count = 0
+                return
             "*** YOUR CODE HERE ***"
             # as many lines as you want
 
-        ________________
+        return name_count
 
-    ________________
+    return make_count
 
 
 def trade(first, second):
