@@ -29,11 +29,3 @@
 
 )
 
-; (define (pow x y)
-  
-;     (cond
-;            ((equal?  y 1) x)
-;            ((even? y)  (square (pow x (quotient y 2))))
-;            ((odd? y)   (* x (square (pow x (quotient (- y 1 ) 2) ) )) )
-;            )
-; )
