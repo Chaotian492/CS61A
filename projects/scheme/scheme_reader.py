@@ -26,6 +26,7 @@ from buffer import Buffer, InputReader, LineReader
 
 # Pairs and Scheme lists
 
+
 class Pair(object):
     """A pair has two instance attributes: first and rest. rest must be a Pair or nil
 
@@ -37,26 +38,32 @@ class Pair(object):
     >>> print(s.map(lambda x: x+4))
     (5 6)
     """
+
     def __init__(self, first, rest):
         from scheme_builtins import scheme_valid_cdrp, SchemeError
-        if not (rest is nil or isinstance(rest, Pair) or type(rest).__name__ == 'Promise'):
+
+        if not (
+            rest is nil or isinstance(rest, Pair) or type(rest).__name__ == "Promise"
+        ):
             print(rest, type(rest).__name__)
-            raise SchemeError("cdr can only be a pair, nil, or a promise but was {}".format(rest))
+            raise SchemeError(
+                "cdr can only be a pair, nil, or a promise but was {}".format(rest)
+            )
         self.first = first
         self.rest = rest
 
     def __repr__(self):
-        return 'Pair({0}, {1})'.format(repr(self.first), repr(self.rest))
+        return "Pair({0}, {1})".format(repr(self.first), repr(self.rest))
 
     def __str__(self):
-        s = '(' + repl_str(self.first)
+        s = "(" + repl_str(self.first)
         rest = self.rest
         while isinstance(rest, Pair):
-            s += ' ' + repl_str(rest.first)
+            s += " " + repl_str(rest.first)
             rest = rest.rest
         if rest is not nil:
-            s += ' . ' + repl_str(rest)
-        return s + ')'
+            s += " . " + repl_str(rest)
+        return s + ")"
 
     def __len__(self):
         n, rest = 1, self.rest
@@ -64,7 +71,7 @@ class Pair(object):
             n += 1
             rest = rest.rest
         if rest is not nil:
-            raise TypeError('length attempted on improper list')
+            raise TypeError("length attempted on improper list")
         return n
 
     def __eq__(self, p):
@@ -78,26 +85,27 @@ class Pair(object):
         if self.rest is nil or isinstance(self.rest, Pair):
             return Pair(mapped, self.rest.map(fn))
         else:
-            raise TypeError('ill-formed list (cdr is a promise)')
+            raise TypeError("ill-formed list (cdr is a promise)")
 
     def flatmap(self, fn):
         """Return a Scheme list after flatmapping Python function FN to SELF."""
         from scheme_builtins import scheme_append
+
         mapped = fn(self.first)
         if self.rest is nil or isinstance(self.rest, Pair):
             return scheme_append(mapped, self.rest.flatmap(fn))
         else:
-            raise TypeError('ill-formed list (cdr is a promise)')
+            raise TypeError("ill-formed list (cdr is a promise)")
 
 
 class nil(object):
     """The empty list"""
 
     def __repr__(self):
-        return 'nil'
+        return "nil"
 
     def __str__(self):
-        return '()'
+        return "()"
 
     def __len__(self):
         return 0
@@ -108,10 +116,10 @@ class nil(object):
     def flatmap(self, fn):
         return self
 
-nil = nil() # Assignment hides the nil class; there is only one instance
+
+nil = nil()  # Assignment hides the nil class; there is only one instance
 
 # Scheme list parser
-
 
 
 def scheme_read(src):
@@ -128,23 +136,28 @@ def scheme_read(src):
     """
     if src.current() is None:
         raise EOFError
-    val = src.pop_first() # Get and remove the first token
-    if val == 'nil':
+    val = src.pop_first()  # Get and remove the first token
+    if val == "nil":
         # BEGIN PROBLEM 1
         "*** YOUR CODE HERE ***"
+        return nil
         # END PROBLEM 1
-    elif val == '(':
+    elif val == "(":
         # BEGIN PROBLEM 1
         "*** YOUR CODE HERE ***"
+        return read_tail(src)
         # END PROBLEM 1
     elif val == "'":
         # BEGIN PROBLEM 6
         "*** YOUR CODE HERE ***"
+
         # END PROBLEM 6
     elif val not in DELIMITERS:
         return val
     else:
-        raise SyntaxError('unexpected token: {0}'.format(val))
+        raise SyntaxError("unexpected token: {0}".format(val))
+
+
 def read_tail(src):
     """Return the remainder of a list in SRC, starting before an element or ).
 
@@ -155,25 +168,33 @@ def read_tail(src):
     """
     try:
         if src.current() is None:
-            raise SyntaxError('unexpected end of file')
-        elif src.current() == ')':
+            raise SyntaxError("unexpected end of file")
+        elif src.current() == ")":
             # BEGIN PROBLEM 1
             "*** YOUR CODE HERE ***"
+            src.pop_first()
+            return nil
             # END PROBLEM 1
         else:
             # BEGIN PROBLEM 1
             "*** YOUR CODE HERE ***"
+            first = scheme_read(src)
+            second = read_tail(src)
+            return Pair(first, second)
             # END PROBLEM 1
     except EOFError:
-        raise SyntaxError('unexpected end of file')
+        raise SyntaxError("unexpected end of file")
+
 
 # Convenience methods
 
-def buffer_input(prompt='scm> '):
+
+def buffer_input(prompt="scm> "):
     """Return a Buffer instance containing interactive input."""
     return Buffer(tokenize_lines(InputReader(prompt)))
 
-def buffer_lines(lines, prompt='scm> ', show_prompt=False):
+
+def buffer_lines(lines, prompt="scm> ", show_prompt=False):
     """Return a Buffer instance iterating through LINES."""
     if show_prompt:
         input_lines = lines
@@ -181,13 +202,17 @@ def buffer_lines(lines, prompt='scm> ', show_prompt=False):
         input_lines = LineReader(lines, prompt)
     return Buffer(tokenize_lines(input_lines))
 
+
 def read_line(line):
     """Read a single string LINE as a Scheme expression."""
     buf = Buffer(tokenize_lines([line]))
     result = scheme_read(buf)
     if buf.more_on_line:
-        raise SyntaxError("read_line's argument can only be a single element, but received multiple")
+        raise SyntaxError(
+            "read_line's argument can only be a single element, but received multiple"
+        )
     return result
+
 
 def repl_str(val):
     """Should largely match str(val), except for booleans and undefined."""
@@ -199,30 +224,32 @@ def repl_str(val):
         return "undefined"
     if isinstance(val, numbers.Number) and not isinstance(val, numbers.Integral):
         return repr(val)  # Python 2 compatibility
-    if isinstance(val, str) and val and val[0] == "\"":
-        return "\"" + repr(val[1:-1])[1:-1] + "\""
+    if isinstance(val, str) and val and val[0] == '"':
+        return '"' + repr(val[1:-1])[1:-1] + '"'
     return str(val)
+
 
 # Interactive loop
 def read_print_loop():
     """Run a read-print loop for Scheme expressions."""
     while True:
         try:
-            src = buffer_input('read> ')
+            src = buffer_input("read> ")
             while src.more_on_line:
                 expression = scheme_read(src)
-                if expression == 'exit':
+                if expression == "exit":
                     print()
                     return
-                print('str :', expression)
-                print('repr:', repr(expression))
+                print("str :", expression)
+                print("repr:", repr(expression))
         except (SyntaxError, ValueError) as err:
-            print(type(err).__name__ + ':', err)
+            print(type(err).__name__ + ":", err)
         except (KeyboardInterrupt, EOFError):  # <Control>-D, etc.
             print()
             return
 
+
 @main
 def main(*args):
-    if len(args) and '--repl' in args:
+    if len(args) and "--repl" in args:
         read_print_loop()
