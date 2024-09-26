@@ -145,6 +145,13 @@ class Frame(object):
             raise SchemeError("Incorrect number of arguments to function call")
         # BEGIN PROBLEM 10
         "*** YOUR CODE HERE ***"
+        child = Frame(self)
+        while formals and vals is not nil:
+            child.define(formals.first, vals.first)
+            formals = formals.rest
+            vals = vals.rest
+        return child
+
         # END PROBLEM 10
 
 
@@ -218,6 +225,9 @@ class LambdaProcedure(Procedure):
         of values, for a lexically-scoped call evaluated in environment ENV."""
         # BEGIN PROBLEM 11
         "*** YOUR CODE HERE ***"
+        child_frame = Frame.make_child_frame(self.env, self.formals, args)
+
+        return child_frame
         # END PROBLEM 11
 
     def __str__(self):
@@ -292,6 +302,28 @@ def do_define_form(expressions, env):
     elif isinstance(target, Pair) and scheme_symbolp(target.first):
         # BEGIN PROBLEM 9
         "*** YOUR CODE HERE ***"
+        # get func's name
+        name_func = target.first
+
+        # get func's parameters
+        para_func = target.rest
+
+        # use helper function create func's body
+        def body_helper(expressions):
+            args = expressions.rest
+            if args.rest is nil:
+                return Pair(args.first, nil)
+            else:
+                return Pair(args.first, body_helper(expressions.rest))
+
+        body = body_helper(expressions)
+
+        # combine parameter and body to create a expression
+        lambda_expressions = Pair(para_func, body)
+        # print(lambda_expressions)
+        lambda_func = do_lambda_form(lambda_expressions, env)
+        env.define(name_func, lambda_func)
+        return name_func
         # END PROBLEM 9
     else:
         bad_target = target.first if isinstance(target, Pair) else target
@@ -337,6 +369,25 @@ def do_lambda_form(expressions, env):
     validate_formals(formals)
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+
+    # args = expressions.rest
+    # body = Pair(args.first, nil)
+    # while args.rest is not nil:
+    #     body.rest = Pair(args.rest.first, nil)
+    #     args = args.rest
+    #     # body = body.rest
+    def get_body(expressions):
+        args = expressions.rest
+
+        if args.rest is nil:
+            body = Pair(args.first, nil)
+            return body
+        else:
+            body = Pair(args.first, get_body(expressions.rest))
+            return body
+
+    body = get_body(expressions)
+    return LambdaProcedure(formals, body, env)
     # END PROBLEM 8
 
 
@@ -371,6 +422,16 @@ def do_and_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
+
+    if expressions is nil:
+        return True
+    elif expressions.rest is nil:
+        return scheme_eval(expressions.first, env)
+    elif is_true_primitive(scheme_eval(expressions.first, env)):
+        return do_and_form(expressions.rest, env)
+    else:
+        return False
+
     # END PROBLEM 12
 
 
@@ -389,6 +450,12 @@ def do_or_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
+    if expressions is nil:
+        return False
+    elif is_false_primitive(scheme_eval(expressions.first, env)):
+        return do_or_form(expressions.rest, env)
+    else:
+        return scheme_eval(expressions.first, env)
     # END PROBLEM 12
 
 
