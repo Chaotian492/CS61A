@@ -648,6 +648,7 @@ class MuProcedure(Procedure):
 
     # BEGIN PROBLEM 18
     "*** YOUR CODE HERE ***"
+
     # END PROBLEM 18
 
     def __str__(self):

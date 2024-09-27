@@ -58,11 +58,10 @@
         ((> (car s) (cadr s)) 
             (cons (cons (car s) nil) (nondecreaselist (cdr s)))
             )
-        ((< (car s) (cadr s)) 
-            (cons(cons (car s) (nondecreaselist (cdr s))) nil)
-            )
-    )
-)
+        ((<= (car s) (cadr s)) 
+            (cons (cons (car s) (car (nondecreaselist (cdr s))) ) (cdr (nondecreaselist (cdr s)) ))
+        )
+))
     ; END PROBLEM 17
 
 ;; Problem EC
